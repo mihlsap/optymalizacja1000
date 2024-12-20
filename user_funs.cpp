@@ -326,8 +326,6 @@ void changeSign(std::string &path, char character1, char character2) {
     }
     inputFile.close();
 
-//    cout << newContent;
-
     ofstream outputFile(path, ios::trunc);
     outputFile << newContent;
     outputFile.close();
