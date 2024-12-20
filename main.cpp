@@ -307,12 +307,9 @@ void lab3() {
 void lab4() {
     const double epsilon = 1e-6;
     const int Nmax = 10000;
-    matrix points = matrix(2, 1, 0.0);
+    matrix points = matrix(2, 1);
 
-//    double hMZk = pen(ff4T);
-
-//    double h = 0.05;
-    double h[2] = {0.05, 0.12};
+    double h[3] = {0.05, 0.12, -1};
     for (auto &value : h) {
         fstream file;
         std::string path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data_{}.csv)", value);
@@ -355,23 +352,23 @@ void lab4() {
 //
 //    int m = 100;
 //    static matrix X(3, m), Y(1, m);
-//    ifstream in(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\XData.txt)");
-//    in >> X;
-//    in.close();
-//    in.open(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\YData.txt)");
-//    in >> Y;
-//    in.close();
+//    ifstream data(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\XData.txt)");
+//    data >> X;
+//    data.close();
+//    data.open(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\YData.txt)");
+//    data >> Y;
+//    data.close();
 //
 //    double P = 0.0;
 //
 //    for (int i = 0; i < 100; i++) {
-//        h = 1.0 / (1 + exp(-(trans(Real_sol.x) * X[i])()));
-//        if (lround(h) == Y(0, i))
-//            h = 1;
+//        double h0 = 1.0 / (1 + exp(-(trans(Real_sol.x) * X[i])()));
+//        if (lround(h0) == Y(0, i))
+//            h0 = 1;
 //        else
-//            h = 0;
+//            h0 = 0;
 //
-//        P += h;
+//        P += h0;
 //    }
 //    P /= m;
 //
