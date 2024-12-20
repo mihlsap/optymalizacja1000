@@ -362,8 +362,8 @@ void lab4() {
 	double P = 0.0;
 
 	for (int i = 0; i < 100; i++) {
-		double h = 1.0 / (1 + exp(-(trans(Real_sol.x) * X[i])()));
-		if (lroundf(h) == Y(0, i))
+		h = 1.0 / (1 + exp(-(trans(Real_sol.x) * X[i])()));
+		if (lround(h) == Y(0, i))
 			h = 1;
 		else
 			h = 0;
