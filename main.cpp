@@ -1,5 +1,6 @@
 #include "opt_alg.h"
 #include<iomanip>
+#include <format>
 
 void lab0();
 
@@ -304,76 +305,77 @@ void lab3() {
 }
 
 void lab4() {
-    matrix x0 = matrix(2, 1, 0.0);
-    const double epsilon = 1e-3;
+    const double epsilon = 1e-6;
     const int Nmax = 10000;
+    matrix points = matrix(2, 1, 0.0);
 
-    double h = 0.05;
+//    double hMZk = pen(ff4T);
 
-    double pkt1[100] = {0};
-    double pkt2[100] = {0};
+//    double h = 0.05;
+    double h[2] = {0.05, 0.12};
+    for (auto &value : h) {
+        fstream file;
+        std::string path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data_{}.csv)", value);
+        file.open(path, ios::out);
 
-    cout << SD(ff4T, gradient, x0, h, epsilon, Nmax) << endl;
-    cout << CG(ff4T, gradient, x0, h, epsilon, Nmax) << endl;
-    cout << Newton(ff4T, gradient, hessian, x0, h, epsilon, Nmax) << endl;
+        for (int i = 0; i < 100; i++) {
+            points = 20 * rand_mat(2, 1) - 10;
+            file << points(0) << ";" << points(1) << ";";
 
-    for (int i = 0; i < 100; i++) {
+            solution SD_sol = SD(ff4T, gradient, points, value, epsilon, Nmax);
+            file << SD_sol.x(0) << ";" << SD_sol.x(1) << ";" << SD_sol.y[0] << SD_sol.f_calls << ";" << SD_sol.g_calls
+                 << ";";
+            solution::clear_calls();
 
-        x0 = 20 * rand_mat(2, 1) - 10;
-        pkt1[i] = x0(0);
-        pkt2[i] = x0(1);
+            solution CG_sol = CG(ff4T, gradient, points, value, epsilon, Nmax);
+            file << CG_sol.x(0) << ";" << CG_sol.x(1) << ";" << CG_sol.y[0] << CG_sol.f_calls << ";" << CG_sol.g_calls
+                 << ";";
+            solution::clear_calls();
+
+            solution Nw_sol = Newton(ff4T, gradient, hessian, points, value, epsilon, Nmax);
+            file << Nw_sol.x(0) << ";" << Nw_sol.x(1) << ";" << Nw_sol.y[0] << Nw_sol.f_calls << ";" << Nw_sol.g_calls
+                 << ";" << Nw_sol.H_calls << ";";
+            solution::clear_calls();
+
+            file << "\n";
+        }
+        file.close();
+
+        changeSign(path, ',', '.');
+        changeSign(path, ';', ',');
     }
-    for(int i = 0; i < 100; i++) {
-        x0(0) = pkt1[i];
-        x0(1) = pkt2[i];
-
-        cout << x0(0) << ";" << x0(1) << ";";
-
-        solution SD_sol = SD(ff4T, gradient, x0, h, epsilon, Nmax);
-        cout << SD_sol.x(0) << ";" << SD_sol.x(1) << ";" << SD_sol.y[0] << SD_sol.f_calls << ";" << SD_sol.g_calls << ";";
-        solution::clear_calls();
-        solution CG_sol = CG(ff4T, gradient, x0, h, epsilon, Nmax);
-        cout << CG_sol.x(0) << ";" << CG_sol.x(1) << ";" << CG_sol.y[0] << CG_sol.f_calls << ";" << CG_sol.g_calls << ";";
-        solution::clear_calls();
-        solution Nw_sol = Newton(ff4T, gradient, hessian, x0, h, epsilon, Nmax);
-        cout << Nw_sol.x(0) << ";" << Nw_sol.x(1) << ";" << Nw_sol.y[0] << Nw_sol.f_calls << ";" << Nw_sol.g_calls << ";" << Nw_sol.H_calls << ";";
-        solution::clear_calls();
-
-        cout << endl;
-    }
-    x0(0) = 6.2231;
-    x0(1) = -0.238002;
-
-    Newton(ff4T, gradient, hessian, x0, -1, epsilon, Nmax);
-
-	matrix x1(3, 1, 0.0);
-
-	solution Real_sol = CG(ff4R, gf, x1, 0.001, 0.000001, Nmax);
-
-	int m = 100;
-	static matrix X(3, m), Y(1, m);
-	ifstream in(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\XData.txt)");
-	in >> X;
-	in.close();
-	in.open(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\YData.txt)");
-	in >> Y;
-	in.close();
-
-	double P = 0.0;
-
-	for (int i = 0; i < 100; i++) {
-		h = 1.0 / (1 + exp(-(trans(Real_sol.x) * X[i])()));
-		if (lround(h) == Y(0, i))
-			h = 1;
-		else
-			h = 0;
-
-		P += h;
-	}
-	P /= m;
-
-	cout << Real_sol.x(0,0) << " " << Real_sol.x(1, 0) << " " << Real_sol.x(2, 0) << " " << Real_sol.y(0, 0) << " " << P << " " << Real_sol.g_calls << endl;
-
+//    points(0) = 6.2231;
+//    points(1) = -0.238002;
+//
+//    Newton(ff4T, gradient, hessian, points, -1, epsilon, Nmax);
+//
+//    matrix x1(3, 1, 0.0);
+//
+//    solution Real_sol = CG(ff4R, gf, x1, 0.001, 0.000001, Nmax);
+//
+//    int m = 100;
+//    static matrix X(3, m), Y(1, m);
+//    ifstream in(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\XData.txt)");
+//    in >> X;
+//    in.close();
+//    in.open(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\YData.txt)");
+//    in >> Y;
+//    in.close();
+//
+//    double P = 0.0;
+//
+//    for (int i = 0; i < 100; i++) {
+//        h = 1.0 / (1 + exp(-(trans(Real_sol.x) * X[i])()));
+//        if (lround(h) == Y(0, i))
+//            h = 1;
+//        else
+//            h = 0;
+//
+//        P += h;
+//    }
+//    P /= m;
+//
+//    cout << Real_sol.x(0, 0) << " " << Real_sol.x(1, 0) << " " << Real_sol.x(2, 0) << " " << Real_sol.y(0, 0) << " " << P << " " << Real_sol.g_calls << endl;
 }
 
 void lab5() {

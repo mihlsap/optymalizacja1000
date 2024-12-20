@@ -314,3 +314,21 @@ matrix gf(matrix x, matrix ud1, matrix ud2) {
     }
     return result;
 }
+
+void changeSign(std::string &path, char character1, char character2) {
+    ifstream inputFile(path);
+    std::string line, newContent;
+    while (std::getline(inputFile, line)) {
+        for (auto &character: line)
+            if (character == character1)
+                character = character2;
+        newContent += line + '\n';
+    }
+    inputFile.close();
+
+//    cout << newContent;
+
+    ofstream outputFile(path, ios::trunc);
+    outputFile << newContent;
+    outputFile.close();
+}

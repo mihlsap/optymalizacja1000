@@ -1,0 +1,17 @@
+# ninja log v6
+206	3738	7564280394788510	CMakeFiles/optymalizacja9000_main.dir/ode_solver.cpp.obj	10423348acabc962
+278	7084	7564019167512856	CMakeFiles/optymalizacja9000_main.dir/matrix.cpp.obj	f3a771bfe7802988
+3740	5604	7564280430125097	CMakeFiles/optymalizacja9000_main.dir/solution.cpp.obj	663bfbdc5733c80c
+143	4531	7564286056669489	CMakeFiles/optymalizacja9000_main.dir/main.cpp.obj	81c5d2616012bb04
+251	4241	7564280395235882	CMakeFiles/optymalizacja9000_main.dir/opt_alg.cpp.obj	dafd699dc7de992d
+103	3288	7564286439140065	CMakeFiles/optymalizacja9000_main.dir/user_funs.cpp.obj	f97e5112a6dfe872
+3292	4515	7564286471024236	optymalizacja9000_main.exe	1a36915b2a4b605
+313	8571	7564294630358822	CMakeFiles/optymalizacja9000_main.dir/ode_solver.cpp.obj	c5632afa7beba5fd
+286	9095	7564294630088828	CMakeFiles/optymalizacja9000_main.dir/matrix.cpp.obj	62efbfdb7da7b50f
+193	11224	7564294629206911	CMakeFiles/optymalizacja9000_main.dir/main.cpp.obj	972d9b1b3f48f9db
+9095	13523	7564294718177438	CMakeFiles/optymalizacja9000_main.dir/solution.cpp.obj	793085ab317dff0a
+8575	13693	7564294712982030	CMakeFiles/optymalizacja9000_main.dir/opt_alg.cpp.obj	a0a0a034a1930256
+11225	16101	7564294739469899	CMakeFiles/optymalizacja9000_main.dir/user_funs.cpp.obj	f3d2793f834a6278
+16103	18330	7564294788251852	optymalizacja9000_main.exe	1a36915b2a4b605
+42	13384	7564295562121840	CMakeFiles/optymalizacja9000_main.dir/main.cpp.obj	972d9b1b3f48f9db
+13388	15240	7564295695587156	optymalizacja9000_main.exe	1a36915b2a4b605

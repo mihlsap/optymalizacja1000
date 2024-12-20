@@ -44,3 +44,5 @@ matrix ff4T(matrix x, matrix ud1, matrix ud2);
 matrix ff4R(matrix x, matrix ud1, matrix ud2);
 
 matrix gf(matrix x, matrix ud1, matrix ud2);
+
+void changeSign(std::string &path, char sign1, char sign2);
