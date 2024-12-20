@@ -270,7 +270,8 @@ matrix ff4R(matrix x, matrix ud1, matrix ud2) {
     int numberOfColumns = 100;
     static matrix XData(numberOfRows, numberOfColumns), YData(1, numberOfColumns);
     if (solution::f_calls == 1) {
-        ifstream file(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\XData.txt)");
+        fstream file;
+        file.open(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\XData.txt)");
         file >> XData;
         file.close();
         file.open(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\YData.txt)");
@@ -293,7 +294,8 @@ matrix gf(matrix x, matrix ud1, matrix ud2) {
     int numberOfColumns = 100;
     static matrix XData(numberOfRows, numberOfColumns), YData(1, numberOfColumns);
     if (solution::g_calls == 1) {
-        ifstream file(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\XData.txt)");
+        fstream file;
+        file.open(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\XData.txt)");
         file >> XData;
         file.close();
         file.open(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\YData.txt)");

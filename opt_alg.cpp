@@ -461,15 +461,15 @@ SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix), mat
         int numberOfRows = get_len(x0);
         matrix d(numberOfRows, 1), P(numberOfRows, 2);
         double *range;
-        solution hypothesisClassificator;
+        solution h;
         while (true) {
             d = -X1.grad(gf, ud1, ud2);
             if (h0 < 0) {
                 P.set_col(X1.x, 0);
                 P.set_col(d, 1);
                 range = expansion(ff, 0, 1, 1.2, Nmax, ud1, P);
-                hypothesisClassificator = golden(ff, range[0], range[1], epsilon, Nmax, ud1, P);
-                X2.x = X1.x + hypothesisClassificator.x * d;
+                h = golden(ff, range[0], range[1], epsilon, Nmax, ud1, P);
+                X2.x = X1.x + h.x * d;
             } else {
                 X2.x = X1.x + h0 * d;
             }
@@ -490,32 +490,32 @@ solution
 CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix), matrix x0, double h0, double epsilon,
    int Nmax, matrix ud1, matrix ud2) {
     try {
-        int n = get_len(x0);
-        solution X, X1;
-        X.x = x0;
-        matrix d(n, 1), P(n, 2);
+        solution X1, X2;
+        X1.x = x0;
+        int numberOfRows = get_len(x0);
+        matrix d(numberOfRows, 1), P(numberOfRows, 2);
         solution h;
-        double *ab, beta;
-        d = -X.grad(gf, ud1, ud2);
+        double *range, beta;
+        d = -X1.grad(gf, ud1, ud2);
         while (true) {
             if (h0 < 0) {
-                P.set_col(X.x, 0);
+                P.set_col(X1.x, 0);
                 P.set_col(d, 1);
-                ab = expansion(ff, 0, 1, 1.2, Nmax, ud1, P);
-                h = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, P);
-                X1.x = X.x + h.x * d;
+                range = expansion(ff, 0, 1, 1.2, Nmax, ud1, P);
+                h = golden(ff, range[0], range[1], epsilon, Nmax, ud1, P);
+                X2.x = X1.x + h.x * d;
             } else {
-                X1.x = X.x + h0 * d;
+                X2.x = X1.x + h0 * d;
             }
-            if (norm(X1.x - X.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax) {
-                X1.fit_fun(ff, ud1);
-                X1.flag = 0;
-                return X1;
+            if (norm(X2.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax) {
+                X2.fit_fun(ff, ud1);
+                X2.flag = 0;
+                return X2;
             }
-            X1.grad(gf);
-            beta = pow(norm(X1.g), 2) / pow(norm(X.g), 2);
-            d = -X1.g + beta * d;
-            X = X1;
+            X2.grad(gf);
+            beta = pow(norm(X2.g), 2) / pow(norm(X1.g), 2);
+            d = -X2.g + beta * d;
+            X1 = X2;
         }
     }
     catch (string ex_info) {
@@ -527,31 +527,31 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
                 matrix(*Hf)(matrix, matrix, matrix), matrix x0, double h0, double epsilon, int Nmax, matrix ud1,
                 matrix ud2) {
     try {
-        int n = get_len(x0);
-        solution X, X1;
-        X.x = x0;
-        matrix d(n, 1), P(n, 2);
+        solution X1, X2;
+        X1.x = x0;
+        int numberOfRows = get_len(x0);
+        matrix d(numberOfRows, 1), P(numberOfRows, 2);
         solution h;
-        double *ab;
+        double *range;
         while (true) {
-            X.grad(gf);
-            X.hess(Hf);
-            d = -inv(X.H) * X.g;
+            X1.grad(gf);
+            X1.hess(Hf);
+            d = -inv(X1.H) * X1.g;
             if (h0 < 0) {
-                P[0] = X.x;
+                P[0] = X1.x;
                 P[1] = d;
-                ab = expansion(ff, 0, 1, 1.2, Nmax, ud1, P);
-                h = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, P);
-                X1.x = X.x + h.x * d;
+                range = expansion(ff, 0, 1, 1.2, Nmax, ud1, P);
+                h = golden(ff, range[0], range[1], epsilon, Nmax, ud1, P);
+                X2.x = X1.x + h.x * d;
             } else {
-                X1.x = X.x + h0 * d;
+                X2.x = X1.x + h0 * d;
             }
-            if (norm(X1.x - X.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax) {
-                X1.fit_fun(ff, ud1);
-                X1.flag = 0;
-                return X1;
+            if (norm(X2.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax) {
+                X2.fit_fun(ff, ud1);
+                X2.flag = 0;
+                return X2;
             }
-            X = X1;
+            X1 = X2;
         }
 
     }
@@ -563,35 +563,34 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 solution
 golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, int Nmax, matrix ud1, matrix ud2) {
     try {
-        double alfa = (sqrt(5) - 1) / 2;
-        solution A, B, C, D;
-        A.x = a;
-        B.x = b;
-        C.x = B.x - alfa * (B.x - A.x);
+        double alpha = (sqrt(5) - 1) / 2;
+        solution A(a), B(b), C, D;
+
+        C.x = B.x - alpha * (B.x - A.x);
+        D.x = A.x + alpha * (B.x - A.x);
+
         C.fit_fun(ff, ud1, ud2);
-        D.x = A.x + alfa * (B.x - A.x);
         D.fit_fun(ff, ud1, ud2);
 
         while (true) {
             if (C.y < D.y) {
                 B = D;
                 D = C;
-                C.x = B.x - alfa * (B.x - A.x);
+                C.x = B.x - alpha * (B.x - A.x);
                 C.fit_fun(ff, ud1, ud2);
             } else {
                 A = C;
                 C = D;
-                D.x = A.x + alfa * (B.x - A.x);
+                D.x = A.x + alpha * (B.x - A.x);
                 D.fit_fun(ff, ud1, ud2);
             }
-            if (B.x - A.x < epsilon || solution::f_calls > Nmax) {
+            if (solution::f_calls > Nmax || B.x - A.x < epsilon) {
                 A.x = (A.x + B.x) / 2;
                 A.fit_fun(ff, ud1, ud2);
-                A.flag = 0;
-                return A;
+                break;
             }
         }
-
+        return A;
     }
     catch (string ex_info) {
         throw ("solution golden(...):\n" + ex_info);
