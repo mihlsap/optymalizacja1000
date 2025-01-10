@@ -30,3 +30,17 @@
 10179	12332	7564334072163829	optymalizacja9000_main.exe	1a36915b2a4b605
 215	10902	7564339797201108	CMakeFiles/optymalizacja9000_main.dir/main.cpp.obj	972d9b1b3f48f9db
 10907	13108	7564339904110039	optymalizacja9000_main.exe	1a36915b2a4b605
+377	6972	7581426835857412	CMakeFiles/optymalizacja9000_main.dir/ode_solver.cpp.obj	c5632afa7beba5fd
+391	7615	7581426835997437	CMakeFiles/optymalizacja9000_main.dir/opt_alg.cpp.obj	a0a0a034a1930256
+348	9332	7581426835577401	CMakeFiles/optymalizacja9000_main.dir/main.cpp.obj	972d9b1b3f48f9db
+6974	11262	7581426901817253	CMakeFiles/optymalizacja9000_main.dir/solution.cpp.obj	793085ab317dff0a
+7616	13731	7581426908239801	CMakeFiles/optymalizacja9000_main.dir/user_funs.cpp.obj	f3d2793f834a6278
+13731	16545	7581426969400270	optymalizacja9000_main.exe	1a36915b2a4b605
+709	11987	7582499926445826	CMakeFiles/optymalizacja9000_main.dir/user_funs.cpp.obj	f3d2793f834a6278
+609	12302	7582499925462698	CMakeFiles/optymalizacja9000_main.dir/opt_alg.cpp.obj	a0a0a034a1930256
+413	14093	7582499923494485	CMakeFiles/optymalizacja9000_main.dir/main.cpp.obj	972d9b1b3f48f9db
+14094	17066	7582500060293409	optymalizacja9000_main.exe	1a36915b2a4b605
+178	9978	7582503965511785	CMakeFiles/optymalizacja9000_main.dir/main.cpp.obj	972d9b1b3f48f9db
+9985	12215	7582504063576218	optymalizacja9000_main.exe	1a36915b2a4b605
+69	9055	7582504978216418	CMakeFiles/optymalizacja9000_main.dir/main.cpp.obj	972d9b1b3f48f9db
+9059	10498	7582505068110729	optymalizacja9000_main.exe	1a36915b2a4b605

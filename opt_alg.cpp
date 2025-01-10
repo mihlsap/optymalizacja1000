@@ -600,8 +600,70 @@ golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, 
 solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, int Nmax, matrix ud1, matrix ud2) {
     try {
         solution Xopt;
-        //Tu wpisz kod funkcji
 
+        double V1[] = {1,0 };
+        double V2[] = { 0,1 };
+        matrix e1(2, V1);
+        matrix e2(2, V2);
+        matrix e[2] = { e1,e2 };
+
+        int n = get_len(x0);
+
+        matrix d[2];
+        matrix d1(n, 1);
+        matrix d2(n, 1);
+
+        solution x;
+        solution p0, p, h[2];
+
+        x.x = x0;
+
+        p0.x = x0;
+        p = p0;
+        int i = 0;
+
+        matrix P(n, 2);
+        double* ab;
+
+        d1 = e[0];
+        d2 = e[1];
+        d[0] = d1;
+        d[1] = d2;
+
+        do {
+            p0 = x;
+            for (int j = 1; j <= n; j++) {
+
+                P.set_col(p.x, 0);
+                P.set_col(d[j - 1], 1);
+
+                ab = find_ab(ff, 0, 1, 1.2, Nmax, ud1, P);
+                h[j - 1] = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, P);
+
+                p.x = p.x + h[j - 1].x * d[j - 1];
+            }
+
+            if (norm(p.x - x.x) < epsilon) {
+                x.fit_fun(ff, ud1);
+                return Xopt = x;
+            }
+
+            for (int j = 1; j <= n - 1; j++)
+                d[0] = d[1];
+
+            d[1] = p.x - p0.x;
+
+            P.set_col(p.x, 0);
+            P.set_col(d[1], 1);
+
+            ab = find_ab(ff, 0, 1, 1.2, Nmax, ud1, P);
+            h[0] = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, P);
+
+            p.x = p.x + h[0].x * d[1];
+            x = p;
+
+            ++i;
+        } while (solution::f_calls < Nmax);
         return Xopt;
     }
     catch (string ex_info) {

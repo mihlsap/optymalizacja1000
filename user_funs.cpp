@@ -330,3 +330,133 @@ void changeSign(std::string &path, char character1, char character2) {
     outputFile << newContent;
     outputFile.close();
 }
+
+matrix fT5(matrix x, matrix ud1, matrix ud2) {
+    matrix Y;
+    if (isnan(ud2(0, 0))) {
+        Y = matrix(2, 1);
+        Y(0) = ud1(1) * (pow(x(0) - 2, 2) + pow(x(1) - 2, 2)); // ud1(1) to a
+        Y(1) = (1.0 / ud1(1)) * (pow(x(0) + 2, 2) + pow(x(1) + 2, 2));
+    } else {
+        matrix yt;
+        yt = fT5(ud2[0] + x * ud2[1], ud1, NAN); // ud2[0] to xi a ud2[1] to di x tutaj to h
+        Y = ud1(0) * yt(0) + (1 - ud1(0)) * yt(1); // ud1(0) to w
+    }
+    return Y;
+}
+
+matrix fR5(matrix x, matrix ud1, matrix ud2) {
+    matrix y;
+
+    if (isnan(ud2(0, 0))) {
+        y = matrix(3, 1);
+        double ro = 7800, P = 1e3, E = 207e9;
+        y(0) = ro * x(0) * 3.14 * pow(x(1), 2) / 4; // ro * l * pi * r^2 - masa
+        y(1) = 64 * P * pow(x(0), 3) / (3 * E * 3.14 * pow(x(1), 4)); // ugiecie 64 * P * l^3 / 3 * E * pi * d^4
+        y(2) = 32 * P * x(0) / (3.14 * pow(x(1), 3)); // naprezenie 31 * P * l / pi * d^3
+    } else {
+        matrix yt, xt = ud2[0] + x * ud2[1]; // ud2[0] = xi, ud2[1] = di
+        yt = fR5(xt, ud1, NAN);
+        y = ud1 * (yt(0) - 0.06) / (1.53 - 0.06) + (1 - ud1) * (yt(1) - 5.25e-6) / (0.0032 - 5.25e-6);
+        double c = 1e10;
+        if (xt(0) < 0.1) // jesli l mniejsze niz 100mm
+            y = y + c * (pow(0.1 - xt(0), 2));
+        if (xt(0) > 1) // jesli l > lm
+            y = y + c * (pow(xt(0) - 1, 2));
+        if (xt(1) < 0.01) // jesli srednica <10mm
+            y = y + c * (pow(0.01 - xt(1), 2));
+        if (xt(1) > 0.05) // jesli d>50mm
+            y = y + c * (pow(xt(1) - 0.05, 2));
+        if (yt(1) > 0.005) // jesli ugiecie wieksze niz 5mm
+            y = y + c * (pow(yt(1) - 0.005, 2));
+        if (yt(2) > 300e6) // jesli naprezenie wieksze niz 300MPa
+            y = y + c * (pow(yt(2) - 300e6, 2));
+    }
+    return y;
+}
+
+matrix f5_1(double a, matrix x, matrix ud1, matrix ud2) {
+    return (a * (pow(x(0) - 2), 2) + (pow(x(1) - 2), 2));
+}
+
+matrix f5_2(double a, matrix x, matrix ud1, matrix ud2) {
+    return ((1 / a) * (pow(x(0) + 2), 2) + (pow(x(1) + 2), 2));
+}
+
+matrix f5(matrix x, matrix ud1, matrix ud2) {
+    if (isnan(ud2(0, 0))) {
+        matrix y;
+        y = matrix(2, new double[2]{0., 0.});
+        y(0) = ud1(1) * (pow(x(0) - 2, 2) + (pow(x(1) - 2, 2)));
+        y(1) = (1 / ud1(1)) * (pow(x(0) + 2, 2) + (pow(x(1) + 2, 2)));
+        return y;
+    } else {
+        return ud1(0) * f5_1(ud1(1), ud2[0] + x * ud2[1], ud1, NAN) +
+               (1 - ud1(0)) * f5_2(ud1(1), ud2[0] + x * ud2[1], ud1, NAN);
+    }
+}
+
+double *
+find_ab(matrix(*ff)(matrix, matrix, matrix), double x0, double d, double alpha, int Nmax, matrix ud1, matrix ud2) {
+    try {
+        double *p = new double[2]{0, 0};
+
+        int i = 0;
+        solution X0, X1, X[3]; // X{ i-1 ; i ; i+1 }
+
+        for (int j = 0; j < 3; j++) {
+            matrix temp(0.);
+            X[j].x = temp;
+            X[j].fit_fun(ff, ud1, ud2);
+        }
+
+        matrix mx0(x0);
+        X0.x = mx0;
+        X1.x = X0.x + d;
+        X0.fit_fun(ff, ud1, ud2);
+        X1.fit_fun(ff, ud1, ud2);
+
+        if (X1.y == X0.y) {
+            p[0] = X1.x(0);
+            p[1] = X0.x(0) - d;
+            return p;
+        }
+
+        if (X1.y > X0.y) {
+            d = -d;
+            X1.x = X0.x + d;
+            X0.fit_fun(ff, ud1, ud2);
+            X1.fit_fun(ff, ud1, ud2);
+
+            if (X1.y >= X0.y) {
+                p[0] = X1.x(0);
+                p[1] = X0.x(0) - d;
+                return p;
+            }
+        }
+
+        do {
+            if (solution::f_calls > Nmax) {
+                return nullptr;
+            }
+            i++;
+            X[0] = X[1];
+            X[1] = X[2];
+            X[2].x = X0.x + pow(alpha, i) * d;
+            X[2].fit_fun(ff, ud1, ud2);
+        } while (X[1].y <= X[2].y || i < 2);
+
+        if (d > 0) {
+            p[0] = X[0].x(0);
+            p[1] = X[2].x(0);
+        } else {
+            p[0] = X[2].x(0);
+            p[1] = X[0].x(0);
+        }
+
+        return p;
+    }
+    catch (string ex_info) {
+        throw ("double* expansion2(...):\n" + ex_info);
+    }
+}

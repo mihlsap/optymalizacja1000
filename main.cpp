@@ -18,7 +18,7 @@ void lab6();
 
 int main() {
     try {
-        lab4();
+        lab5();
     } catch (string EX_INFO) {
         cerr << "ERROR:\n";
         cerr << EX_INFO << endl << endl;
@@ -310,7 +310,7 @@ void lab4() {
     matrix points = matrix(2, 1);
 
     double h[3] = {0.05, 0.12, -1};
-    for (auto &value : h) {
+    for (auto &value: h) {
         fstream file;
         std::string path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data_{}.csv)", value);
         file.open(path, ios::out);
@@ -376,6 +376,61 @@ void lab4() {
 }
 
 void lab5() {
+    solution results;
+    vector<double> a = {1, 10, 100};
+    double w = 0.0;
+    matrix ud1(2, new double[2]{w, a[0]});
+
+    const double epsilon = 1e-7;
+    const int Nmax = 10000;
+
+    matrix x0[101];
+    for (int i = 0; i < 101; i++)
+        x0[i] = 20 * rand_mat(2, 1) - 10;
+
+    for (auto &value: a) {
+
+        fstream file;
+        std::string path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data5\data_{}.csv)", value);
+        file.open(path, ios::out);
+
+        for (int i = 0; i < 101; i++) {
+
+            ud1(1) = value;
+            results = Powell(f5, x0[i], epsilon, Nmax, ud1, NAN);
+
+            if (value == a[0])
+                file << x0[i](0) << ";" << x0[i](1) << ";";
+
+            file << results.x(0) << ";" << results.x(1) << ";" << results.y(0) << ";"
+                 << results.y(1) << ";" << solution::f_calls << "\n";
+
+            solution::clear_calls();
+            ud1(0) += 0.01;
+        }
+        file.close();
+        changeSign(path, ',', '.');
+        changeSign(path, ';', ',');
+    }
+
+    // Problem rzeczywisty
+    /*
+    solution naszSolution;
+    double waga = 0.0;
+    matrix ud1(waga);
+    for (int i = 0; i < 101; i++) {
+        double l, d;
+        l = (900. * ((double)rand() / (double)RAND_MAX)) + 100.;
+        d = (40. * ((double)rand() / (double)RAND_MAX)) - 10.;
+        double pom[2] = { l,d };
+        matrix x0(2, pom);
+        naszSolution = Powell(fR5, x0, 0.001, 1000, ud1, 0);
+        cout << l << " " << d << " " << naszSolution.x(0) << " " << naszSolution.x(1) << " " << naszSolution.y(0) << " " << naszSolution.y(1) << " " << " " << solution::f_calls << endl;
+        solution::clear_calls();
+
+        ud1(0) += 0.01;
+    }
+    */
 }
 
 void lab6() {
