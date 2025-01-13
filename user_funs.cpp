@@ -332,32 +332,39 @@ void changeSign(std::string &path, char character1, char character2) {
 }
 
 matrix ff5R(matrix x, matrix ud1, matrix ud2) {
-    matrix result;
+    matrix y;
+    double f1min = 0.442412, f1max = 3.05827, f2min = 4.19746e-5, f2max = 0.00205017;
+    double l_0 = 0.2, l_1 = 1.0;
+    double d_0 = 0.01, d_1 = 0.05;
 
-    result = matrix(3, 1);
-    double ro = 7800, P = 1000, E = 207e9;
-    result(0) = ro * x(0) * 3.14 * pow(x(1), 2) / 4;
-    result(1) = 64 * P * pow(x(0), 3) / (3 * E * 3.14 * pow(x(1), 4));
-    result(2) = 32 * P * x(0) / (3.14 * pow(x(1), 3));
+    if (isnan(ud2(0, 0))) {
+        y = matrix(3, 1);
+        double ro = 7800, P = 1e3, E = 207e9;
+        y(0) = ro * x(0) * M_PI * pow(x(1), 2) / 4;
+        y(1) = 64 * P * pow(x(0), 3) / (3 * E * M_PI * pow(x(1), 4));
+        y(2) = 32 * P * x(0) / (M_PI * pow(x(1), 3));
+    } else {
+        solution solution;
+        matrix yn(2, 1);
+        solution.x = matrix(2, 1);
+        solution.x(0) = l_0 + x(0) * (l_1 - l_0);
+        solution.x(1) = d_0 + x(1) * (d_1 - d_0);
+        solution.fit_fun(ff5T, ud1, ud2);
 
-    matrix values_1 = ud2[0] + x * ud2[1];
-    matrix values_2 = ff5R(values_1, ud1, NAN);
+        yn(0) = (solution.y(0) - f1min) / (f1max - f1min);
+        yn(1) = (solution.y(1) - f2min) / (f2max - f2min);
 
-    result = ud1 * (values_2(0) - 0.06) / (1.53 - 0.06) + (1 - ud1) * (values_2(1) - 5.25e-6) / (0.0032 - 5.25e-6);
-    double c = 1e10;
-    if (values_1(0) < 0.1)
-        result = result + c * (pow(0.1 - values_1(0), 2));
-    if (values_1(0) > 1)
-        result = result + c * (pow(values_1(0) - 1, 2));
-    if (values_1(1) < 0.01)
-        result = result + c * (pow(0.01 - values_1(1), 2));
-    if (values_1(1) > 0.05)
-        result = result + c * (pow(values_1(1) - 0.05, 2));
-    if (values_2(1) > 0.005)
-        result = result + c * (pow(values_2(1) - 0.005, 2));
-    if (values_2(2) > 300e6)
-        result = result + c * (pow(values_2(2) - 300e6, 2));
-    return result;
+        double w = ud1(0);
+        y = w * yn(0) + (1 - w) * yn(1);
+
+        if (solution.y(1) > 0.005) {
+            y = y + 1e6 * pow(solution.y(1) - 0.005, 2);
+        }
+        if (solution.y(2) > 300e6) {
+            y = y + 1e6 * pow(solution.y(2) - 300e6, 2);
+        }
+    }
+    return y;
 }
 
 matrix ff5T_1(double a, matrix x, matrix ud1, matrix ud2) {

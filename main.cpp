@@ -425,9 +425,8 @@ void lab5() {
     for (int i = 0; i < iterations; i++) {
         double l = (900.0 * ((double) rand() / (double) RAND_MAX)) + 100.0;
         double d = (40.0 * ((double) rand() / (double) RAND_MAX)) - 10.0;
-        double parameters[2] = {l, d};
-        matrix x(2, parameters);
-        result = Powell(ff5R, x, epsilon, Nmax, ud1_1, NULL);
+        matrix x(2, new double[2]{l, d});
+        result = Powell(ff5R, x, epsilon, Nmax, ud1_1, 0);
         file << l << " " << d << " " << result.x(0) << " " << result.x(1) << " " << result.y(0) << " "
              << result.y(1) << " " << " " << solution::f_calls << endl;
         solution::clear_calls();
