@@ -335,12 +335,12 @@ matrix fT5(matrix x, matrix ud1, matrix ud2) {
     matrix result;
     if (isnan(ud2(0, 0))) {
         result = matrix(2, 1);
-        result(0) = ud1(1) * (pow(x(0) - 2, 2) + pow(x(1) - 2, 2)); // ud1(1) to a
+        result(0) = ud1(1) * (pow(x(0) - 2, 2) + pow(x(1) - 2, 2));
         result(1) = (1.0 / ud1(1)) * (pow(x(0) + 2, 2) + pow(x(1) + 2, 2));
     } else {
-        matrix yt;
-        yt = fT5(ud2[0] + x * ud2[1], ud1, NAN); // ud2[0] to xi a ud2[1] to di x tutaj to h
-        result = ud1(0) * yt(0) + (1 - ud1(0)) * yt(1); // ud1(0) to w
+        matrix matrix;
+        matrix = fT5(ud2[0] + x * ud2[1], ud1, NAN);
+        result = ud1(0) * matrix(0) + (1 - ud1(0)) * matrix(1);
     }
     return result;
 }
@@ -351,26 +351,26 @@ matrix fR5(matrix x, matrix ud1, matrix ud2) {
     if (isnan(ud2(0, 0))) {
         result = matrix(3, 1);
         double ro = 7800, P = 1000, E = 207e9;
-        result(0) = ro * x(0) * 3.14 * pow(x(1), 2) / 4; // masa
-        result(1) = 64 * P * pow(x(0), 3) / (3 * E * 3.14 * pow(x(1), 4)); // ugiecie
-        result(2) = 32 * P * x(0) / (3.14 * pow(x(1), 3)); // naprezenie
+        result(0) = ro * x(0) * 3.14 * pow(x(1), 2) / 4;
+        result(1) = 64 * P * pow(x(0), 3) / (3 * E * 3.14 * pow(x(1), 4));
+        result(2) = 32 * P * x(0) / (3.14 * pow(x(1), 3));
     } else {
-        matrix yt, xt = ud2[0] + x * ud2[1]; // ud2[0] = xi, ud2[1] = di
-        yt = fR5(xt, ud1, NAN);
-        result = ud1 * (yt(0) - 0.06) / (1.53 - 0.06) + (1 - ud1) * (yt(1) - 5.25e-6) / (0.0032 - 5.25e-6);
+        matrix values_1, values_2 = ud2[0] + x * ud2[1];
+        values_1 = fR5(values_2, ud1, NAN);
+        result = ud1 * (values_1(0) - 0.06) / (1.53 - 0.06) + (1 - ud1) * (values_1(1) - 5.25e-6) / (0.0032 - 5.25e-6);
         double c = 1e10;
-        if (xt(0) < 0.1) // l < 100mm
-            result = result + c * (pow(0.1 - xt(0), 2));
-        if (xt(0) > 1) // l > lm
-            result = result + c * (pow(xt(0) - 1, 2));
-        if (xt(1) < 0.01) // d < 10mm
-            result = result + c * (pow(0.01 - xt(1), 2));
-        if (xt(1) > 0.05) // d > 50mm
-            result = result + c * (pow(xt(1) - 0.05, 2));
-        if (yt(1) > 0.005) // ugiecie > 5mm
-            result = result + c * (pow(yt(1) - 0.005, 2));
-        if (yt(2) > 300e6) // naprezenie > 300MPa
-            result = result + c * (pow(yt(2) - 300e6, 2));
+        if (values_2(0) < 0.1)
+            result = result + c * (pow(0.1 - values_2(0), 2));
+        if (values_2(0) > 1)
+            result = result + c * (pow(values_2(0) - 1, 2));
+        if (values_2(1) < 0.01)
+            result = result + c * (pow(0.01 - values_2(1), 2));
+        if (values_2(1) > 0.05)
+            result = result + c * (pow(values_2(1) - 0.05, 2));
+        if (values_1(1) > 0.005)
+            result = result + c * (pow(values_1(1) - 0.005, 2));
+        if (values_1(2) > 300e6)
+            result = result + c * (pow(values_1(2) - 300e6, 2));
     }
     return result;
 }
@@ -386,7 +386,7 @@ matrix f5_2(double a, matrix x, matrix ud1, matrix ud2) {
 matrix f5(matrix x, matrix ud1, matrix ud2) {
     if (isnan(ud2(0, 0))) {
         matrix y;
-        y = matrix(2, new double[2]{0., 0.});
+        y = matrix(2, new double[2]{0, 0});
         y(0) = ud1(1) * (pow(x(0) - 2, 2) + (pow(x(1) - 2, 2)));
         y(1) = (1 / ud1(1)) * (pow(x(0) + 2, 2) + (pow(x(1) + 2, 2)));
         return y;

@@ -600,11 +600,7 @@ golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, 
 solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, int Nmax, matrix ud1, matrix ud2) {
     try {
         const int n = get_len(x0);
-
-        double val1[] = {1, 0};
-        double val2[] = {0, 1};
-        matrix e[2] = {matrix(2, val1), matrix(2, val2)};
-
+        matrix e[2] = {matrix(2, new double[2] {1, 0}), matrix(2, new double[2] {0, 1})};
         matrix d1(n, 1);
         matrix d2(n, 1);
         d1 = e[0];
