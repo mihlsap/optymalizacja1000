@@ -599,53 +599,42 @@ golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, 
 
 solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, int Nmax, matrix ud1, matrix ud2) {
     try {
-        solution Xopt;
+        const int n = get_len(x0);
 
-        double V1[] = {1,0 };
-        double V2[] = { 0,1 };
-        matrix e1(2, V1);
-        matrix e2(2, V2);
-        matrix e[2] = { e1,e2 };
+        double val1[] = {1, 0};
+        double val2[] = {0, 1};
+        matrix e[2] = {matrix(2, val1), matrix(2, val2)};
 
-        int n = get_len(x0);
-
-        matrix d[2];
         matrix d1(n, 1);
         matrix d2(n, 1);
-
-        solution x;
-        solution p0, p, h[2];
-
-        x.x = x0;
-
-        p0.x = x0;
-        p = p0;
-        int i = 0;
-
-        matrix P(n, 2);
-        double* ab;
-
         d1 = e[0];
         d2 = e[1];
-        d[0] = d1;
-        d[1] = d2;
+        matrix d[2] = {d1, d2};
 
-        do {
+        solution x(x0);
+        solution p0(x0), p(x0), h[2];
+        double *range;
+        matrix P(n, 2);
+
+        for (;;) {
+            if (solution::f_calls < Nmax)
+                break;
+
             p0 = x;
-            for (int j = 1; j <= n; j++) {
 
+            for (int j = 0; j < n; j++) {
                 P.set_col(p.x, 0);
-                P.set_col(d[j - 1], 1);
+                P.set_col(d[j], 1);
 
-                ab = find_ab(ff, 0, 1, 1.2, Nmax, ud1, P);
-                h[j - 1] = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, P);
+                range = expansion(ff, 0, 1, 1.2, Nmax, ud1, P);
+                h[j] = golden(ff, range[0], range[1], epsilon, Nmax, ud1, P);
 
-                p.x = p.x + h[j - 1].x * d[j - 1];
+                p.x = p.x + h[j].x * d[j];
             }
 
             if (norm(p.x - x.x) < epsilon) {
                 x.fit_fun(ff, ud1);
-                return Xopt = x;
+                return solution(x);
             }
 
             for (int j = 1; j <= n - 1; j++)
@@ -656,15 +645,12 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
             P.set_col(p.x, 0);
             P.set_col(d[1], 1);
 
-            ab = find_ab(ff, 0, 1, 1.2, Nmax, ud1, P);
-            h[0] = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, P);
+            range = expansion(ff, 0, 1, 1.2, Nmax, ud1, P);
+            h[0] = golden(ff, range[0], range[1], epsilon, Nmax, ud1, P);
 
             p.x = p.x + h[0].x * d[1];
             x = p;
-
-            ++i;
-        } while (solution::f_calls < Nmax);
-        return Xopt;
+        }
     }
     catch (string ex_info) {
         throw ("solution Powell(...):\n" + ex_info);

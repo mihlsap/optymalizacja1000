@@ -377,16 +377,17 @@ void lab4() {
 
 void lab5() {
     solution results;
-    vector<double> a = {1, 10, 100};
+    const int iterations = 101;
+    vector<double> a = {1.0, 10.0, 100.0};
     double w = 0.0;
     matrix ud1(2, new double[2]{w, a[0]});
 
-    const double epsilon = 1e-7;
+    const double epsilon = 1e-6;
     const int Nmax = 10000;
 
-    matrix x0[101];
-    for (int i = 0; i < 101; i++)
-        x0[i] = 20 * rand_mat(2, 1) - 10;
+    matrix x0[iterations];
+    for (auto &x: x0)
+        x = 20 * rand_mat(2, 1) - 10;
 
     for (auto &value: a) {
 
@@ -394,13 +395,13 @@ void lab5() {
         std::string path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data5\data_{}.csv)", value);
         file.open(path, ios::out);
 
-        for (int i = 0; i < 101; i++) {
+        for (auto &x: x0) {
 
             ud1(1) = value;
-            results = Powell(f5, x0[i], epsilon, Nmax, ud1, NAN);
+            results = Powell(f5, x, epsilon, Nmax, ud1, NAN);
 
             if (value == a[0])
-                file << x0[i](0) << ";" << x0[i](1) << ";";
+                file << x(0) << ";" << x(1) << ";";
 
             file << results.x(0) << ";" << results.x(1) << ";" << results.y(0) << ";"
                  << results.y(1) << ";" << solution::f_calls << "\n";
@@ -414,23 +415,27 @@ void lab5() {
     }
 
     // Problem rzeczywisty
-    /*
-    solution naszSolution;
-    double waga = 0.0;
-    matrix ud1(waga);
-    for (int i = 0; i < 101; i++) {
-        double l, d;
-        l = (900. * ((double)rand() / (double)RAND_MAX)) + 100.;
-        d = (40. * ((double)rand() / (double)RAND_MAX)) - 10.;
-        double pom[2] = { l,d };
-        matrix x0(2, pom);
-        naszSolution = Powell(fR5, x0, 0.001, 1000, ud1, 0);
-        cout << l << " " << d << " " << naszSolution.x(0) << " " << naszSolution.x(1) << " " << naszSolution.y(0) << " " << naszSolution.y(1) << " " << " " << solution::f_calls << endl;
+    fstream file;
+    std::string path = R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data5\real_solution_data.csv)";
+    file.open(path, ios::out);
+
+    solution result;
+    matrix ud1_1(0.0);
+
+    for (int i = 0; i < iterations; i++) {
+        double l = (900.0 * ((double) rand() / (double) RAND_MAX)) + 100.0;
+        double d = (40.0 * ((double) rand() / (double) RAND_MAX)) - 10.0;
+        double parameters[2] = {l, d};
+        matrix x(2, parameters);
+        result = Powell(fR5, x, epsilon, Nmax, ud1_1, NULL);
+        file << l << " " << d << " " << result.x(0) << " " << result.x(1) << " " << result.y(0) << " "
+             << result.y(1) << " " << " " << solution::f_calls << endl;
         solution::clear_calls();
 
-        ud1(0) += 0.01;
+        ud1_1(0) += 0.01;
     }
-    */
+
+    file.close();
 }
 
 void lab6() {

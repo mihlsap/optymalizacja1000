@@ -53,4 +53,3 @@ matrix fR5(matrix x, matrix ud1, matrix ud2);
 matrix f5(matrix x, matrix ud1, matrix ud2);
 matrix f5_1(double a, matrix x, matrix ud1, matrix ud2);
 matrix f5_2(double a, matrix x, matrix ud1, matrix ud2);
-double* find_ab(matrix(*ff)(matrix, matrix, matrix), double x0, double d, double alpha, int Nmax, matrix ud1, matrix ud2);
