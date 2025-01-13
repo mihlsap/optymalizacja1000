@@ -339,8 +339,10 @@ matrix ff5R(matrix x, matrix ud1, matrix ud2) {
     result(0) = ro * x(0) * 3.14 * pow(x(1), 2) / 4;
     result(1) = 64 * P * pow(x(0), 3) / (3 * E * 3.14 * pow(x(1), 4));
     result(2) = 32 * P * x(0) / (3.14 * pow(x(1), 3));
+
     matrix values_1 = ud2[0] + x * ud2[1];
     matrix values_2 = ff5R(values_1, ud1, NAN);
+
     result = ud1 * (values_2(0) - 0.06) / (1.53 - 0.06) + (1 - ud1) * (values_2(1) - 5.25e-6) / (0.0032 - 5.25e-6);
     double c = 1e10;
     if (values_1(0) < 0.1)
@@ -367,13 +369,6 @@ matrix ff5T_2(double a, matrix x, matrix ud1, matrix ud2) {
 }
 
 matrix ff5T(matrix x, matrix ud1, matrix ud2) {
-    if (isnan(ud2(0, 0))) {
-        matrix y = matrix(2, new double[2]{0, 0});
-        y(0) = ud1(1) * (pow(x(0) - 2, 2) + (pow(x(1) - 2, 2)));
-        y(1) = (1 / ud1(1)) * (pow(x(0) + 2, 2) + (pow(x(1) + 2, 2)));
-        return y;
-    } else {
-        return ud1(0) * ff5T_1(ud1(1), ud2[0] + x * ud2[1], ud1, NAN) +
-               (1 - ud1(0)) * ff5T_2(ud1(1), ud2[0] + x * ud2[1], ud1, NAN);
-    }
+    return ud1(0) * ff5T_1(ud1(1), ud2[0] + x * ud2[1], ud1, NAN) +
+           (1 - ud1(0)) * ff5T_2(ud1(1), ud2[0] + x * ud2[1], ud1, NAN);
 }
