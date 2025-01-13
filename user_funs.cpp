@@ -331,21 +331,7 @@ void changeSign(std::string &path, char character1, char character2) {
     outputFile.close();
 }
 
-matrix fT5(matrix x, matrix ud1, matrix ud2) {
-    matrix result;
-    if (isnan(ud2(0, 0))) {
-        result = matrix(2, 1);
-        result(0) = ud1(1) * (pow(x(0) - 2, 2) + pow(x(1) - 2, 2));
-        result(1) = (1.0 / ud1(1)) * (pow(x(0) + 2, 2) + pow(x(1) + 2, 2));
-    } else {
-        matrix matrix;
-        matrix = fT5(ud2[0] + x * ud2[1], ud1, NAN);
-        result = ud1(0) * matrix(0) + (1 - ud1(0)) * matrix(1);
-    }
-    return result;
-}
-
-matrix fR5(matrix x, matrix ud1, matrix ud2) {
+matrix ff5R(matrix x, matrix ud1, matrix ud2) {
     matrix result;
 
     if (isnan(ud2(0, 0))) {
@@ -355,43 +341,42 @@ matrix fR5(matrix x, matrix ud1, matrix ud2) {
         result(1) = 64 * P * pow(x(0), 3) / (3 * E * 3.14 * pow(x(1), 4));
         result(2) = 32 * P * x(0) / (3.14 * pow(x(1), 3));
     } else {
-        matrix values_1, values_2 = ud2[0] + x * ud2[1];
-        values_1 = fR5(values_2, ud1, NAN);
-        result = ud1 * (values_1(0) - 0.06) / (1.53 - 0.06) + (1 - ud1) * (values_1(1) - 5.25e-6) / (0.0032 - 5.25e-6);
+        matrix values_1 = ud2[0] + x * ud2[1];
+        matrix values_2 = ff5R(values_1, ud1, NAN);
+        result = ud1 * (values_2(0) - 0.06) / (1.53 - 0.06) + (1 - ud1) * (values_2(1) - 5.25e-6) / (0.0032 - 5.25e-6);
         double c = 1e10;
-        if (values_2(0) < 0.1)
-            result = result + c * (pow(0.1 - values_2(0), 2));
-        if (values_2(0) > 1)
-            result = result + c * (pow(values_2(0) - 1, 2));
-        if (values_2(1) < 0.01)
-            result = result + c * (pow(0.01 - values_2(1), 2));
-        if (values_2(1) > 0.05)
-            result = result + c * (pow(values_2(1) - 0.05, 2));
-        if (values_1(1) > 0.005)
-            result = result + c * (pow(values_1(1) - 0.005, 2));
-        if (values_1(2) > 300e6)
-            result = result + c * (pow(values_1(2) - 300e6, 2));
+        if (values_1(0) < 0.1)
+            result = result + c * (pow(0.1 - values_1(0), 2));
+        if (values_1(0) > 1)
+            result = result + c * (pow(values_1(0) - 1, 2));
+        if (values_1(1) < 0.01)
+            result = result + c * (pow(0.01 - values_1(1), 2));
+        if (values_1(1) > 0.05)
+            result = result + c * (pow(values_1(1) - 0.05, 2));
+        if (values_2(1) > 0.005)
+            result = result + c * (pow(values_2(1) - 0.005, 2));
+        if (values_2(2) > 300e6)
+            result = result + c * (pow(values_2(2) - 300e6, 2));
     }
     return result;
 }
 
-matrix f5_1(double a, matrix x, matrix ud1, matrix ud2) {
+matrix ff5T_1(double a, matrix x, matrix ud1, matrix ud2) {
     return (a * (pow(x(0) - 2), 2) + (pow(x(1) - 2), 2));
 }
 
-matrix f5_2(double a, matrix x, matrix ud1, matrix ud2) {
+matrix ff5T_2(double a, matrix x, matrix ud1, matrix ud2) {
     return ((1 / a) * (pow(x(0) + 2), 2) + (pow(x(1) + 2), 2));
 }
 
-matrix f5(matrix x, matrix ud1, matrix ud2) {
+matrix ff5T(matrix x, matrix ud1, matrix ud2) {
     if (isnan(ud2(0, 0))) {
-        matrix y;
-        y = matrix(2, new double[2]{0, 0});
+        matrix y = matrix(2, new double[2]{0, 0});
         y(0) = ud1(1) * (pow(x(0) - 2, 2) + (pow(x(1) - 2, 2)));
         y(1) = (1 / ud1(1)) * (pow(x(0) + 2, 2) + (pow(x(1) + 2, 2)));
         return y;
     } else {
-        return ud1(0) * f5_1(ud1(1), ud2[0] + x * ud2[1], ud1, NAN) +
-               (1 - ud1(0)) * f5_2(ud1(1), ud2[0] + x * ud2[1], ud1, NAN);
+        return ud1(0) * ff5T_1(ud1(1), ud2[0] + x * ud2[1], ud1, NAN) +
+               (1 - ud1(0)) * ff5T_2(ud1(1), ud2[0] + x * ud2[1], ud1, NAN);
     }
 }

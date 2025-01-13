@@ -398,7 +398,7 @@ void lab5() {
         for (auto &x: x0) {
 
             ud1(1) = value;
-            results = Powell(f5, x, epsilon, Nmax, ud1, NAN);
+            results = Powell(ff5T, x, epsilon, Nmax, ud1, NAN);
 
             if (value == a[0])
                 file << x(0) << ";" << x(1) << ";";
@@ -427,7 +427,7 @@ void lab5() {
         double d = (40.0 * ((double) rand() / (double) RAND_MAX)) - 10.0;
         double parameters[2] = {l, d};
         matrix x(2, parameters);
-        result = Powell(fR5, x, epsilon, Nmax, ud1_1, NULL);
+        result = Powell(ff5R, x, epsilon, Nmax, ud1_1, NULL);
         file << l << " " << d << " " << result.x(0) << " " << result.x(1) << " " << result.y(0) << " "
              << result.y(1) << " " << " " << solution::f_calls << endl;
         solution::clear_calls();
