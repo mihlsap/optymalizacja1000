@@ -444,38 +444,42 @@ void lab6() {
 
     vector<double> sigma = {0.01, 0.1, 1.0, 10.0, 100.0};
 
-    matrix lb(1, N), ub(1, N);
+    matrix lb(1, N), ub(1, N); //lower i upper boundary
     lb(0, 0) = -5;
-    ub(1, 0) = -5;
-    lb(0, 1) = 5;
-    ub(1, 1) = 5;
+    lb(0, 1) = -5;
+    ub(0, 0) = 5;
+    ub(0, 1) = 5;
 
     for (auto &x : sigma) {
         fstream file;
         std::string path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data6\data_{}.csv)", x);
         file.open(path, ios::out);
 
-        matrix sigma0(1, 1, x);
-        solution results = EA(fT6, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NAN, NAN);
-        file << results.x(0) << ";" << results.x(1) << ";" << results.y << ";" << results.f_calls << "\n";
-        solution::clear_calls();
+        matrix sigma0(2, 1, x);
+        for (int i = 0; i < 100; i++) {
+            solution results = EA(ff6T, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NAN, NAN);
+            file << results.x(0) << ";" << results.x(1) << ";" << results.y << solution::f_calls << "\n";
+            changeSign(path, ',', '.');
+            changeSign(path, ';', ',');
+            solution::clear_calls();
+        }
         file.close();
     }
 
 //    matrix sigma0(2, 1, 1);
 //
-//    solution solEvo = EA(fT6, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NULL, NULL);
+//    solution solEvo = EA(ff6T, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NULL, NULL);
 //
 //    sigma0(0) = sigma0(1) = 100; // sigma - 0.01 / 0.1 / 1 / 10 / 100
 //    for (int i = 0; i < 100; ++i) {
 //        solution::clear_calls();
-//        solEvo = EA(fT6, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NULL, NULL);
+//        solEvo = EA(ff6T, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NULL, NULL);
 //
 //        cout << solEvo.x(0) << ";" << solEvo.x(1) << ";" << solEvo.y << solEvo.f_calls << ";" << endl;
 //    }
 
-//
-//    // Problem rzeczywisty
+
+    // Problem rzeczywisty
 //    matrix limits2(2, 2), sigma1(2, 1);
 //    limits2(0, 0) = limits2(1, 0) = 0.1;
 //    limits2(0, 1) = limits2(1, 1) = 3;
@@ -486,14 +490,14 @@ void lab6() {
 //    solution test;
 //
 //    // rzeczywisty przeprowadzono dla epsilon = 1e-4
-//    //test = EA(fR6, N, limits, mi, lambda, sigma1, epsilon, Nmax, simulation);
+//    //test = EA(ff6R, N, limits, mi, lambda, sigma1, epsilon, Nmax, simulation);
 //
 //    //cout << test << endl;
 //    matrix xopt(2, 1);
 //    xopt(0) = 2.10424;
 //    xopt(1) = 0.0142826;
 //
-//    fR6(xopt, NAN, NAN);
+//    ff6R(xopt, NAN, NAN);
 
 
 }

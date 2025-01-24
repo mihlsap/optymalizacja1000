@@ -380,11 +380,11 @@ matrix ff5T(matrix x, matrix ud1, matrix ud2) {
            (1 - ud1(0)) * ff5T_2(ud1(1), ud2[0] + x * ud2[1], ud1, NAN);
 }
 
-matrix fT6(matrix x, matrix ud1, matrix ud2) {
+matrix ff6T(matrix x, matrix ud1, matrix ud2) {
     return pow(x(0), 2) + pow(x(1), 2) - cos(2.5 * M_PI * x(0)) - cos(2.5 * M_PI * x(1)) + 2;
 }
 
-matrix df6(double t, matrix Y, matrix ud1, matrix ud2) {
+matrix df6R(double t, matrix Y, matrix ud1, matrix ud2) {
     double b1 = ud2(0);
     double b2 = ud2(1);
 
@@ -405,7 +405,7 @@ matrix df6(double t, matrix Y, matrix ud1, matrix ud2) {
     return dY;
 }
 
-matrix fR6(matrix x, matrix ud1, matrix ud2) {
+matrix ff6R(matrix x, matrix ud1, matrix ud2) {
 
     matrix y;
     int N = 1001;
@@ -416,7 +416,7 @@ matrix fR6(matrix x, matrix ud1, matrix ud2) {
     in.close();
 
     matrix YO(4, new double[4]{ 0, 0, 0, 0 });
-    matrix* Y = solve_ode(df6, 0, 0.1, 100, YO, ud1, x);
+    matrix* Y = solve_ode(df6R, 0, 0.1, 100, YO, ud1, x);
 
     y = 0;
 
