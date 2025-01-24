@@ -657,79 +657,93 @@ solution
 EA(matrix(*ff)(matrix, matrix, matrix), int N, matrix lb, matrix ub, int mi, int lambda, matrix sigma0, double epsilon,
    int Nmax, matrix ud1, matrix ud2) {
     try {
-        // SIGMA PRZEKAZYWANA JAKO MACIERZ JEDNOELEMENTOWA W MAIN
-        // lb i ub - lower i upper boundary
-        auto *P = new solution[mi + lambda];
-        auto *Pm = new solution[mi];
-        default_random_engine defaultRandomEngine;
-        defaultRandomEngine.seed(static_cast<unsigned int>(chrono::system_clock::now().time_since_epoch().count()));
-        normal_distribution<double> normalDistribution(0.0, 1.0);
-        matrix IFF(mi, 1), temp(N, 2); //IFF macierz z przystosowaniami //temp - kopia osobnikia
-        double r, s, s_IFF;
-        double tau = pow(2 * N, -0.5);
-        double tau1 = pow(2 * pow(N, 0.5), -0.5); //tau, tau1 - mutacja
-        int j_min; // najlepsze rozwiazanie
-        for (int i = 0; i < mi; ++i) {
-            P[i].x = matrix(N, 2);
-            for (int j = 0; j < N; ++j) {
-                P[i].x(j, 0) = (ub(0, j) - lb(0, j)) * rand_mat(1, 1)() + lb(0, j);
-                P[i].x(j, 1) = sigma0(0);
+        std::random_device randomDevice;
+        std::mt19937 mersenneTwisterEngine(randomDevice());
+        std::normal_distribution<double> normalDistribution(0.0, 1.0);
+
+        auto *result = new solution[mi + lambda];
+        auto *res = new solution[mi];
+
+        matrix CM(mi, 1);
+        matrix T(N, 2);
+
+        double alpha = pow(N, -0.5), beta = pow(2 * N, -0.25);
+        double r, s, g;
+
+        int minIndex;
+
+        for (int i = 0; i < mi; i++) {
+            result[i].x = matrix(N, 2);
+
+            for (int j = 0; j < N; j++) {
+                result[i].x(j, 0) = (ub(0, j) - lb(0, j)) * rand_mat(1, 1)() + lb(0, j);
+                result[i].x(j, 1) = sigma0(0);
             }
-            P[i].fit_fun(ff, ud1, ud2);
-            if (P[i].y < epsilon)
-                return P[i];
+            result[i].fit_fun(ff, ud1, ud2);
+
+            if (result[i].y < epsilon)
+                return result[i];
         }
         while (true) {
-            s_IFF = 0;
-            for (int i = 0; i < mi; ++i) {
-                IFF(i) = 1 / P[i].y();
-                s_IFF += IFF(i);
+            g = 0;
+
+            for (int i = 0; i < mi; i++) {
+                CM(i) = 1 / result[i].y();
+                g += CM(i);
             }
-            for (int i = 0; i < lambda; ++i) {
-                r = s_IFF * rand_mat(1, 1)();
+
+            for (int i = 0; i < lambda; i++) {
+                r = g * rand_mat(1, 1)();
                 s = 0;
-                for (int j = 0; j < mi; ++j) {
-                    s += IFF(j);
+
+                for (int j = 0; j < mi; j++) {
+                    s += CM(j);
+
                     if (r <= s) {
-                        P[mi + i] = P[j]; // j - wylosowany osobnik
+                        result[mi + i] = result[j];
                         break;
                     }
                 }
             }
-            //mutacja
+
             for (int i = 0; i < lambda; ++i) {
-                r = normalDistribution(defaultRandomEngine);
+                r = normalDistribution(mersenneTwisterEngine);
+
                 for (int j = 0; j < N; ++j) {
-                    P[mi + i].x(j, 1) *= exp(tau1 * r + tau * normalDistribution(defaultRandomEngine));
-                    P[mi + i].x(j, 0) += P[mi + i].x(j, 1) * normalDistribution(defaultRandomEngine);
+                    result[mi + i].x(j, 1) *= exp(beta * r + alpha * normalDistribution(mersenneTwisterEngine));
+                    result[mi + i].x(j, 0) += result[mi + i].x(j, 1) * normalDistribution(mersenneTwisterEngine);
                 }
             }
-            //krzyzowanie
+
             for (int i = 0; i < lambda; i += 2) {
                 r = rand_mat(1, 1)();
-                temp = P[mi + i].x;  //jeden z rodzicow
-                P[mi + i].x = r * P[mi + i].x + (1 - r) * P[mi + i + 1].x;  //pierwszy potomek
-                P[mi + i + 1].x = r * P[mi + i + 1].x + (1 - r) * temp;  //drugi potomek
+                T = result[mi + i].x;
+                result[mi + i].x = r * result[mi + i].x + (1 - r) * result[mi + i + 1].x;
+                result[mi + i + 1].x = r * result[mi + i + 1].x + (1 - r) * T;
             }
-            //ocena osobnikow
+
             for (int i = 0; i < lambda; ++i) {
-                P[mi + i].fit_fun(ff, ud1, ud2);
-                if (P[mi + i].y < epsilon)    //ocena rozwiazania
-                    return P[mi + i];
+                result[mi + i].fit_fun(ff, ud1, ud2);
+
+                if (result[mi + i].y < epsilon)
+                    return result[mi + i];
             }
-            //wskazanie najlepszych osobnikow
+
             for (int i = 0; i < mi; ++i) {
-                j_min = 0;
+                minIndex = 0;
+
                 for (int j = 1; j < mi + lambda; ++j)
-                    if (P[j_min].y > P[j].y)
-                        j_min = j;
-                Pm[i] = P[j_min];
-                P[j_min].y = 1e10;
+                    if (result[minIndex].y > result[j].y)
+                        minIndex = j;
+
+                res[i] = result[minIndex];
+                result[minIndex].y = 1e10;
             }
             for (int i = 0; i < mi; ++i)
-                P[i] = Pm[i];  //P[i] najlepsza populacja
+                result[i] = res[i];
+
             if (solution::f_calls > Nmax)
-                return P[0];
+                return result[0];
         }
     }
     catch (string ex_info) {

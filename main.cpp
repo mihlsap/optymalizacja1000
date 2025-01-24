@@ -444,15 +444,17 @@ void lab6() {
 
     vector<double> sigma = {0.01, 0.1, 1.0, 10.0, 100.0};
 
-    matrix lb(1, N), ub(1, N); //lower i upper boundary
+    matrix lb(1, N), ub(1, N);
     lb(0, 0) = -5;
     lb(0, 1) = -5;
     ub(0, 0) = 5;
     ub(0, 1) = 5;
 
-    for (auto &x : sigma) {
-        fstream file;
-        std::string path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data6\data_{}.csv)", x);
+    fstream file;
+    std::string path;
+
+    for (auto &x: sigma) {
+        path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data6\data_{}.csv)", x);
         file.open(path, ios::out);
 
         matrix sigma0(2, 1, x);
@@ -466,38 +468,21 @@ void lab6() {
         file.close();
     }
 
-//    matrix sigma0(2, 1, 1);
-//
-//    solution solEvo = EA(ff6T, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NULL, NULL);
-//
-//    sigma0(0) = sigma0(1) = 100; // sigma - 0.01 / 0.1 / 1 / 10 / 100
-//    for (int i = 0; i < 100; ++i) {
-//        solution::clear_calls();
-//        solEvo = EA(ff6T, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NULL, NULL);
-//
-//        cout << solEvo.x(0) << ";" << solEvo.x(1) << ";" << solEvo.y << solEvo.f_calls << ";" << endl;
-//    }
+//  problem rzeczywisty
+    matrix sigma0(2, 1, 1.0);
+    solution results = EA(ff6T, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NAN, NAN);
+    cout << results << "\n";
 
+    matrix xopt(2, 1);
+    xopt(0) = results.x(0);
+    xopt(1) = results.x(1);
 
-    // Problem rzeczywisty
-//    matrix limits2(2, 2), sigma1(2, 1);
-//    limits2(0, 0) = limits2(1, 0) = 0.1;
-//    limits2(0, 1) = limits2(1, 1) = 3;
-//
-//    sigma1(0) = sigma1(1) = 1;
-//
-//    matrix simulation = matrix(0);
-//    solution test;
-//
-//    // rzeczywisty przeprowadzono dla epsilon = 1e-4
-//    //test = EA(ff6R, N, limits, mi, lambda, sigma1, epsilon, Nmax, simulation);
-//
-//    //cout << test << endl;
-//    matrix xopt(2, 1);
-//    xopt(0) = 2.10424;
-//    xopt(1) = 0.0142826;
-//
-//    ff6R(xopt, NAN, NAN);
+    path = R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data6\real_solution.csv)";
+    file.open(path, ios::out);
 
-
+    matrix *Y = ff6R(xopt, NAN, NAN);
+    for (int i = 0; i < N; i++) {
+        file << Y[1](i, 0) << ";" << Y[1](i, 2) << "\n";
+    }
+    file.close();
 }

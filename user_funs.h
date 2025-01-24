@@ -39,5 +39,5 @@ matrix ff5T_1(double a, matrix x, matrix ud1, matrix ud2);
 matrix ff5T_2(double a, matrix x, matrix ud1, matrix ud2);
 
 matrix ff6T(matrix x, matrix ud1, matrix ud2);
-matrix ff6R(matrix x, matrix ud1, matrix ud2);
+matrix* ff6R(matrix x, matrix ud1, matrix ud2);
 matrix df6R(double t, matrix Y, matrix ud1, matrix ud2);

@@ -385,18 +385,13 @@ matrix ff6T(matrix x, matrix ud1, matrix ud2) {
 }
 
 matrix df6R(double t, matrix Y, matrix ud1, matrix ud2) {
-    double b1 = ud2(0);
-    double b2 = ud2(1);
-
-    double k1 = 1;
-    double k2 = 1;
-
-    double m1 = 5;
-    double m2 = 5;
-
+    double m1 = 5, m2 = 5;
+    double k1 = 1, k2 = 1;
+    double b1 = ud2(0), b2 = ud2(1);
     double F = 1;
 
     matrix dY(4, 1);
+
     dY(0) = Y(1);
     dY(1) = (-b1 * Y(1) - b2 * (Y(1) - Y(3)) - k1 * Y(0) - k2 * (Y(0) - Y(2))) / m1;
     dY(2) = Y(3);
@@ -405,27 +400,30 @@ matrix df6R(double t, matrix Y, matrix ud1, matrix ud2) {
     return dY;
 }
 
-matrix ff6R(matrix x, matrix ud1, matrix ud2) {
-
-    matrix y;
+matrix *ff6R(matrix x, matrix ud1, matrix ud2) {
     int N = 1001;
-    matrix X(N, 2);
+    matrix data(N, 2);
 
-    ifstream in("C:\\Users\\Dell\\Downloads\\optymalizacja9000-main\\data6\\polozenia.txt");
-    in >> X;
-    in.close();
+    fstream file;
+    std::string path = R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data6\polozenia.txt)";
+    file.open(path, ios::in);
 
-    matrix YO(4, new double[4]{ 0, 0, 0, 0 });
-    matrix* Y = solve_ode(df6R, 0, 0.1, 100, YO, ud1, x);
+    int i = 0;
+    std::string line;
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string number1, number2;
 
-    y = 0;
+        std::getline(ss, number1, ';');
+        std::getline(ss, number2, '\n');
+        double num1 = std::stod(number1);
+        double num2 = std::stod(number2);
 
-    for (int i = 0; i < N; i++) {
-        y = y + abs(X(i, 0) - Y[1](i, 0)) + abs(X(i, 1) - Y[1](i, 2));
-        cout << Y[1](i, 0) << ";" << Y[1](i, 2) << endl;
+        data(i, 0) = num1;
+        data(i, 1) = num2;
+        i++;
     }
+    file.close();
 
-    y = y / (2 * N);
-
-    return y;
+    return solve_ode(df6R, 0, 0.1, 100, matrix(4, new double[4]{0, 0, 0, 0}), ud1, x);
 }
