@@ -416,6 +416,8 @@ matrix *ff6R(matrix x, matrix ud1, matrix ud2) {
 
         std::getline(ss, number1, ';');
         std::getline(ss, number2, '\n');
+        changeStringSign(number1, ',', '.');
+        changeStringSign(number2, ',', '.');
         double num1 = std::stod(number1);
         double num2 = std::stod(number2);
 
@@ -426,4 +428,10 @@ matrix *ff6R(matrix x, matrix ud1, matrix ud2) {
     file.close();
 
     return solve_ode(df6R, 0, 0.1, 100, matrix(4, new double[4]{0, 0, 0, 0}), ud1, x);
+}
+
+void changeStringSign(std::string &str, char character, char character2) {
+    for (auto &ch: str)
+        if (ch == character)
+            ch = character2;
 }
