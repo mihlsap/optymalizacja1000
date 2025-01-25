@@ -453,20 +453,20 @@ void lab6() {
     fstream file;
     std::string path;
 
-//    for (auto &x: sigma) {
-//        path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data6\data_{}.csv)", x);
-//        file.open(path, ios::out);
-//
-//        matrix sigma0(2, 1, x);
-//        for (int i = 0; i < 100; i++) {
-//            solution results = EA(ff6T, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NAN, NAN);
-//            file << results.x(0) << ";" << results.x(1) << ";" << results.y << solution::f_calls << "\n";
-//            changeSign(path, ',', '.');
-//            changeSign(path, ';', ',');
-//            solution::clear_calls();
-//        }
-//        file.close();
-//    }
+    for (auto &x: sigma) {
+        path = std::format(R"(C:\Users\Dell\Downloads\optymalizacja9000-main\data6\data_{}.csv)", x);
+        file.open(path, ios::out);
+
+        matrix sigma0(2, 1, x);
+        for (int i = 0; i < 100; i++) {
+            solution results = EA(ff6T, N, lb, ub, mi, lambda, sigma0, epsilon, Nmax, NAN, NAN);
+            file << results.x(0) << ";" << results.x(1) << ";" << results.y << solution::f_calls << "\n";
+            changeSign(path, ',', '.');
+            changeSign(path, ';', ',');
+            solution::clear_calls();
+        }
+        file.close();
+    }
 
 //  problem rzeczywisty
     matrix sigma0(2, 1, 1.0);
